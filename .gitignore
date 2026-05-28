@@ -1,0 +1,115 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pkl
+*.h5
+*.keras
+*.joblib
+
+# virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# =========================
+# TensorFlow / ML
+# =========================
+saved_model/
+checkpoints/
+logs/
+tensorboard_logs/
+*.tflite
+*.pb
+*.tflite
+
+# dataset (VERY IMPORTANT - usually large)
+data/
+datasets/
+*.csv
+*.zip
+*.tar
+*.gz
+
+# =========================
+# FastAPI / backend
+# =========================
+*.db
+*.sqlite3
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+
+# =========================
+# Flutter (if you use Flutter app)
+# =========================
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Runner.xcworkspace/
+
+# =========================
+# React Native (if used instead)
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+android/app/build/
+ios/build/
+
+.expo/
+
+# =========================
+# IDE / Editors
+# =========================
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# GCP / Deployment
+# =========================
+*.json
+!package.json
+service-account-key.json
+gcloud-config.json
+
+# =========================
+# Misc
+# =========================
+dist/
+build/
+out/
