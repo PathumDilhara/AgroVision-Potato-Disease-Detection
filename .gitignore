@@ -24,6 +24,7 @@ ENV/
 # TensorFlow / ML
 # =========================
 saved_model/
+saved_models/
 checkpoints/
 logs/
 tensorboard_logs/
