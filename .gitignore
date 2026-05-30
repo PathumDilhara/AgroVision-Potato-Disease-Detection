@@ -10,6 +10,10 @@ __pycache__/
 *.h5
 *.keras
 *.joblib
+*.jpg
+*.JPG
+*.JPEG
+*.jpeg
 
 # virtual environments
 venv/
@@ -25,6 +29,7 @@ ENV/
 # =========================
 saved_model/
 saved_models/
+processed_data/
 checkpoints/
 logs/
 tensorboard_logs/

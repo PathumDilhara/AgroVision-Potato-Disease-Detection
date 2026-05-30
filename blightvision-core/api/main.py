@@ -5,6 +5,8 @@ from io import BytesIO
 from PIL import Image
 import tensorflow as tf
 
+# run the app : uvicorn main:app --reload
+
 app = FastAPI()
 
 MODEL = tf.saved_model.load("../saved_models/export/1")

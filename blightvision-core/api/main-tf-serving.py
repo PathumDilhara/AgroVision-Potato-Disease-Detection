@@ -6,6 +6,8 @@ from PIL import Image
 import tensorflow as tf
 import requests
 
+# run the app : uvicorn main-tf-serving:app --reload
+
 app = FastAPI()
 
 # /v1/models/<model_name>:predict
