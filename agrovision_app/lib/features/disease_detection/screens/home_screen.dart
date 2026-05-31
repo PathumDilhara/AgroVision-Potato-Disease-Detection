@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:agrovision_app/features/disease_detection/screens/camera_screen.dart';
+import 'package:agrovision_app/features/disease_detection/services/prediction_service.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,23 +20,35 @@ class _HomeScreenState extends State<HomeScreen> {
   final ValueNotifier<PredictionResult> predictedResult = ValueNotifier(
     PredictionResult.empty(),
   );
+  final ValueNotifier<bool> _isPredicting = ValueNotifier(false);
 
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImageFromGallery() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
-    print("########## ${image == null}");
+    //print("########## ${image == null}");
 
     if (image != null) {
       file.value = File(image.path);
     }
   }
 
-  Future<PredictionResult> _getPredictedResult() async {
-    print("### Predicting...");
+  Future<void> _getPredictedResult() async {
+    if (file.value != null) {
+      //print("### Predicting...");
+      _isPredicting.value = true;
+      predictedResult.value = await PredictionService().getPrediction(
+        file.value!,
+      );
 
-    return PredictionResult.empty();
+      _isPredicting.value = false;
+    }
+  }
+
+  void resetState() {
+    file.value = null;
+    predictedResult.value = PredictionResult.empty();
   }
 
   @override
@@ -87,9 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           onPressed: () async {
-                            print("Capture");
+                            //print("Capture");
 
-                            file.value = null;
+                            resetState();
 
                             final cameras = await availableCameras();
                             String result = "";
@@ -106,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             if (result.isNotEmpty) {
                               // result is image path
-                              print("### Captured image: $result");
+                              //print("### Captured image: $result");
                               file.value = File(result);
                             }
                           },
@@ -134,8 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           onPressed: () {
-                            print("import");
-                            file.value = null;
+                            // print("import");
+                            resetState();
                             _pickImageFromGallery();
                           },
                           child: Row(
@@ -194,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             return value.isEmpty
                                 ? SizedBox()
                                 : Text(
-                                  "${predictedResult.value.predictedClass}\nConfidence : ${predictedResult.value.confidence}%",
+                                  "${predictedResult.value.predictedClass}\nConfidence : ${predictedResult.value.confidence.toString()}%",
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -204,30 +217,41 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
 
-                        ValueListenableBuilder(
-                          valueListenable: file,
-                          builder: (context, value, child) {
-                            return value == null
-                                ? SizedBox()
-                                : ElevatedButton(
+                        AnimatedBuilder(
+                          animation: Listenable.merge([file, predictedResult]),
+                          builder: (context, child) {
+                            final f = file.value;
+                            final prediction = predictedResult.value;
+
+                            return f != null && prediction.isEmpty
+                                ? ElevatedButton(
                                   style: ButtonStyle(
                                     backgroundColor: WidgetStatePropertyAll(
                                       Colors.greenAccent,
                                     ),
                                   ),
                                   onPressed: () async {
-                                    predictedResult.value =
-                                        await _getPredictedResult();
+                                    await _getPredictedResult();
                                   },
-                                  child: Text(
-                                    "Check",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black,
-                                    ),
+                                  child: ValueListenableBuilder(
+                                    valueListenable: _isPredicting,
+                                    builder: (context, value, child) {
+                                      return value
+                                          ? CircularProgressIndicator(
+                                            color: Colors.green,
+                                          )
+                                          : Text(
+                                            "Check",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black,
+                                            ),
+                                          );
+                                    },
                                   ),
-                                );
+                                )
+                                : SizedBox();
                           },
                         ),
                       ],
