@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:agrovision_app/features/disease_detection/screens/camera_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../models/prediction_result.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,7 +15,28 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ValueNotifier<String> _imgPath = ValueNotifier("");
+  final ValueNotifier<File?> file = ValueNotifier<File?>(null);
+  final ValueNotifier<PredictionResult> predictedResult = ValueNotifier(
+    PredictionResult.empty(),
+  );
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImageFromGallery() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    print("########## ${image == null}");
+
+    if (image != null) {
+      file.value = File(image.path);
+    }
+  }
+
+  Future<PredictionResult> _getPredictedResult() async {
+    print("### Predicting...");
+
+    return PredictionResult.empty();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () async {
                             print("Capture");
 
-                            _imgPath.value = "";
+                            file.value = null;
 
                             final cameras = await availableCameras();
                             String result = "";
@@ -83,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             if (result.isNotEmpty) {
                               // result is image path
                               print("### Captured image: $result");
-                              _imgPath.value = result;
+                              file.value = File(result);
                             }
                           },
                           child: Row(
@@ -111,6 +135,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           onPressed: () {
                             print("import");
+                            file.value = null;
+                            _pickImageFromGallery();
                           },
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -136,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: 30),
 
               ValueListenableBuilder(
-                valueListenable: _imgPath,
+                valueListenable: file,
                 builder: (context, value, child) {
                   return Container(
                     padding: EdgeInsets.all(16),
@@ -151,27 +177,58 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: MediaQuery.of(context).size.width * 0.8,
                           height: MediaQuery.of(context).size.width * 0.8,
                           child:
-                              value.isEmpty
-                                  ? Icon(
+                              value != null
+                                  ? Image.file(value, fit: BoxFit.fitWidth)
+                                  : Icon(
                                     Icons.image_not_supported_outlined,
                                     size: 200,
                                     color: Colors.grey,
-                                  )
-                                  : Image.file(
-                                    File(value),
-                                    fit: BoxFit.fitWidth,
                                   ),
                         ),
 
                         SizedBox(height: 20),
 
-                        Text(
-                          "Early__Blight\nConfidence : 100%",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                        ValueListenableBuilder(
+                          valueListenable: predictedResult,
+                          builder: (context, value, child) {
+                            return value.isEmpty
+                                ? SizedBox()
+                                : Text(
+                                  "${predictedResult.value.predictedClass}\nConfidence : ${predictedResult.value.confidence}%",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                );
+                          },
+                        ),
+
+                        ValueListenableBuilder(
+                          valueListenable: file,
+                          builder: (context, value, child) {
+                            return value == null
+                                ? SizedBox()
+                                : ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStatePropertyAll(
+                                      Colors.greenAccent,
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    predictedResult.value =
+                                        await _getPredictedResult();
+                                  },
+                                  child: Text(
+                                    "Check",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                );
+                          },
                         ),
                       ],
                     ),

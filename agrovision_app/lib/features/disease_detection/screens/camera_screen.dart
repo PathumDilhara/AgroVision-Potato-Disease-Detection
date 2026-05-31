@@ -31,11 +31,11 @@ class _CameraScreenState extends State<CameraScreen> {
   Future<void> _takePicture() async {
     try {
       await _initializeControllerFuture;
-      final image = await _controller.takePicture();
+      final image = await _controller.takePicture(); // return type is XFIle
 
       if (!mounted) return;
 
-      print("#### ${image.path}");
+      // print("#### ${image.path}");
 
       _buildDialogBox(image.path);
 
