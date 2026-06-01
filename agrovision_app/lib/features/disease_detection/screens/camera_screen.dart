@@ -127,7 +127,10 @@ class _CameraScreenState extends State<CameraScreen> {
                       backgroundColor: WidgetStatePropertyAll(Colors.orange),
                     ),
                     onPressed: () {
+                      // close dialog box
                       Navigator.pop(context);
+
+                      // go back to home screen by returning imgPath
                       Navigator.pop(context, path);
                     },
                     child: Text("Done", style: TextStyle(color: Colors.black)),

@@ -105,10 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             resetState();
 
                             final cameras = await availableCameras();
-                            String result = "";
+                            String imgPath = "";
 
                             if (context.mounted) {
-                              result = await Navigator.push(
+                              // When camera screen pop it will be returned the imgPath
+                              imgPath = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder:
@@ -117,10 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               );
                             }
 
-                            if (result.isNotEmpty) {
-                              // result is image path
+                            if (imgPath.isNotEmpty) {
                               //print("### Captured image: $result");
-                              file.value = File(result);
+                              file.value = File(imgPath);
                             }
                           },
                           child: Row(
